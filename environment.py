@@ -5,8 +5,11 @@ from time import sleep
 from food import Food
 from individual import Individual
 
+# Simulation parameters
+ind_lifetime = 100
+
 class Environment:
-    def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, fps=10, seed=42):
+    def __init__(self, grid_size=30, num_of_ind=5, num_of_food=10, ticks=1000, fps=10, seed=42):
         self.grid_size = grid_size
         self.num_of_ind = num_of_ind
         self.num_of_food = num_of_food
@@ -17,6 +20,7 @@ class Environment:
         self.init_variables()
     
     def init_variables(self):
+        self.rand = np.random.default_rng(self.seed)
         self.background = init_background(self)
         self.grid = init_grid(self)
         self.tick = 0
@@ -62,7 +66,7 @@ def drawGrid(screen, env):
     for x in range(env.grid_size):
         for y in range(env.grid_size):
             # Draw background
-            rect = pygame.Rect(x * block_size, y * block_size, block_size, block_size)
+            rect = pygame.Rect(x * block_size, y * block_size, block_size + 1, block_size + 1)
             pygame.draw.rect(screen, (0, env.background[x][y], 0), rect)
 
             # Draw individuals
@@ -79,19 +83,17 @@ def drawGrid(screen, env):
 
 def init_background(env) -> list:
     background = []
-    np.random.seed(env.seed)
 
     for x in range(env.grid_size):
         column = []
         for y in range(env.grid_size):
-            column.append(np.random.randint(150, 220))
+            column.append(env.rand.integers(150, 220))
         background.append(column)
     
     return background
 
 def init_grid(env) -> list:
     grid = []
-    np.random.seed(env.seed)
 
     # Initialize empty grid
     for x in range(env.grid_size):
@@ -101,15 +103,15 @@ def init_grid(env) -> list:
         grid.append(column)
 
     # Generate individuals
-    x_values = np.random.choice(range(env.grid_size), size=env.num_of_ind)
-    y_values = np.random.choice(range(env.grid_size), size=env.num_of_ind)
+    x_values = env.rand.choice(range(env.grid_size), size=env.num_of_ind)
+    y_values = env.rand.choice(range(env.grid_size), size=env.num_of_ind)
 
     for i in range(env.num_of_ind):
-        grid[x_values[i]][y_values[i]] = Individual(200, 5)
+        grid[x_values[i]][y_values[i]] = Individual(ind_lifetime, 5)
     
     # Generate food
-    x_values = np.random.choice([x for x in range(env.grid_size) if x not in x_values], size=env.num_of_food)
-    y_values = np.random.choice([y for y in range(env.grid_size) if y not in y_values], size=env.num_of_food)
+    x_values = env.rand.choice([x for x in range(env.grid_size) if x not in x_values], size=env.num_of_food)
+    y_values = env.rand.choice([y for y in range(env.grid_size) if y not in y_values], size=env.num_of_food)
 
     for i in range(env.num_of_food):
         grid[x_values[i]][y_values[i]] = Food()
