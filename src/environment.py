@@ -30,10 +30,10 @@ class Environment:
 
     def render(self):
         pygame.init()
-        env.screen_size = 800
-        screen = pygame.display.set_mode((env.screen_size, env.screen_size))
+        self.screen_size = 800
+        screen = pygame.display.set_mode((self.screen_size, self.screen_size))
         pygame.display.set_caption("Gridworld")
-        env.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
+        self.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
 
         running = True
 
