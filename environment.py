@@ -6,12 +6,12 @@ from food import Food
 from individual import Individual
 
 class Environment:
-    def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, seed=42):
+    def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, fps=10, seed=42):
         self.grid_size = grid_size
         self.num_of_ind = num_of_ind
         self.num_of_food = num_of_food
         self.ticks = ticks
-        self.tick = 0
+        self.fps = fps
         self.seed = seed
 
         self.init_variables()
@@ -19,6 +19,7 @@ class Environment:
     def init_variables(self):
         self.background = init_background(self)
         self.grid = init_grid(self)
+        self.tick = 0
 
     def reset(self):
         self.init_variables()
@@ -27,7 +28,7 @@ class Environment:
         for x in range(self.grid_size):
             for y in range(self.grid_size):
                 if self.grid[x][y] != 0:
-                    self.grid[x][y].step()
+                    self.grid[x][y].step((x, y), self)
 
     def render(self):
         pygame.init()
@@ -38,16 +39,19 @@ class Environment:
 
         running = True
 
-        while running:
+        while running and self.tick < self.ticks:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             
-            sleep(0.1)
+            if self.fps != 0:
+                sleep(1/self.fps)
+            
             screen.fill((0, 0, 0))
             drawGrid(screen, self)
             pygame.display.flip()
 
+            self.step()
             self.tick += 1
         
         pygame.quit()
