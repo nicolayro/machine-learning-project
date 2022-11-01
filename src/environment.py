@@ -3,6 +3,7 @@ import pygame.freetype
 import numpy as np
 from time import sleep
 from food import Food
+from individual import Individual
 
 class Environment:
     def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, seed=42):
@@ -26,7 +27,7 @@ class Environment:
         for x in range(self.grid_size):
             for y in range(self.grid_size):
                 if self.grid[x][y] != 0:
-                    pass    # Todo: Replace with call to step() in Individual/Food
+                    self.grid[x][y].step()
 
     def render(self):
         pygame.init()
@@ -61,7 +62,7 @@ def drawGrid(screen, env):
             pygame.draw.rect(screen, (0, env.background[x][y], 0), rect)
 
             # Draw individuals
-            if env.grid[x][y] == 1:     # Todo: Replace with comparison to Individual class
+            if isinstance(env.grid[x][y], Individual):
                 pygame.draw.circle(screen, (220, 0, 0), ((x + 0.5) * block_size, ((y + 0.5) * block_size)), block_size / 4)
             
             # Draw food
@@ -100,7 +101,7 @@ def init_grid(env) -> list:
     y_values = np.random.choice(range(env.grid_size), size=env.num_of_ind)
 
     for i in range(env.num_of_ind):
-        grid[x_values[i]][y_values[i]] = 1  # Todo: Create Individual
+        grid[x_values[i]][y_values[i]] = Individual(200, 5)
     
     # Generate food
     x_values = np.random.choice([x for x in range(env.grid_size) if x not in x_values], size=env.num_of_food)
