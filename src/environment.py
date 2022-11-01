@@ -1,12 +1,16 @@
 import pygame
+import pygame.freetype
 import numpy as np
 from time import sleep
+from food import Food
 
 class Environment:
-    def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, seed=42):
+    def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, seed=42):
         self.grid_size = grid_size
         self.num_of_ind = num_of_ind
         self.num_of_food = num_of_food
+        self.ticks = ticks
+        self.tick = 0
         self.seed = seed
 
         self.init_variables()
@@ -26,10 +30,10 @@ class Environment:
 
     def render(self):
         pygame.init()
-        screen_size = 800
-        screen = pygame.display.set_mode((screen_size, screen_size))
-        self.block_size = screen_size / self.grid_size
+        env.screen_size = 800
+        screen = pygame.display.set_mode((env.screen_size, env.screen_size))
         pygame.display.set_caption("Gridworld")
+        env.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
 
         running = True
 
@@ -42,24 +46,31 @@ class Environment:
             screen.fill((0, 0, 0))
             drawGrid(screen, self)
             pygame.display.flip()
+
+            self.tick += 1
         
         pygame.quit()
 
 def drawGrid(screen, env):
+    block_size = env.screen_size / env.grid_size
+
     for x in range(env.grid_size):
         for y in range(env.grid_size):
             # Draw background
-            rect = pygame.Rect(x * env.block_size, y * env.block_size, env.block_size, env.block_size)
+            rect = pygame.Rect(x * block_size, y * block_size, block_size, block_size)
             pygame.draw.rect(screen, (0, env.background[x][y], 0), rect)
 
             # Draw individuals
             if env.grid[x][y] == 1:     # Todo: Replace with comparison to Individual class
-                pygame.draw.circle(screen, (220, 0, 0), ((x + 0.5) * env.block_size, ((y + 0.5) * env.block_size)), env.block_size / 4)
+                pygame.draw.circle(screen, (220, 0, 0), ((x + 0.5) * block_size, ((y + 0.5) * block_size)), block_size / 4)
             
             # Draw food
-            if env.grid[x][y] == 2:     # Todo: Replace with comparison to Food class
-                rect = pygame.Rect((x + 0.25) * env.block_size, (y + 0.25) * env.block_size, env.block_size / 2, env.block_size / 2)
+            if isinstance(env.grid[x][y], Food):
+                rect = pygame.Rect((x + 0.25) * block_size, (y + 0.25) * block_size, block_size / 2, block_size / 2)
                 pygame.draw.rect(screen, (227, 206, 18), rect)
+            
+            # Render text
+            env.font.render_to(screen, (10, env.screen_size - 24), str(env.tick), (0, 0, 0))
 
 def init_background(env) -> list:
     background = []
@@ -96,6 +107,6 @@ def init_grid(env) -> list:
     y_values = np.random.choice([y for y in range(env.grid_size) if y not in y_values], size=env.num_of_food)
 
     for i in range(env.num_of_food):
-        grid[x_values[i]][y_values[i]] = 2  # Todo: Create Food
+        grid[x_values[i]][y_values[i]] = Food()
 
     return grid
