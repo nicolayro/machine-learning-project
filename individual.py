@@ -15,9 +15,16 @@ class Individual():
             # Move towards food
             pass
         else:
-            new_x, new_y = random_movement(pos, env.seed)
-            if new_x < 0 or new_x > env.grid_size - 1 or new_y < 0 or new_y > env.grid_size - 1:
+            new_x, new_y = random_pos(pos, env.rand)
+
+            # Check out of bounds
+            if new_x < 0 or new_x >= env.grid_size or new_y < 0 or new_y >= env.grid_size:
                 return
+            
+            # Check individual collision
+            if isinstance(env.grid[new_x][new_y], Individual):
+                return
+
             env.grid[x][y] = 0
             env.grid[new_x][new_y] = self
 
@@ -44,9 +51,9 @@ def sees_food(area):
 
 
 
-def random_movement(pos, seed):
+def random_pos(pos, rand):
     x, y = pos
-    rand = np.random.randint(4)
+    rand = rand.integers(0, 4)
     if rand == 0:
         return [x - 1, y]
     if rand == 1:
