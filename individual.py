@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Individual(Entity):
+class Individual():
     def __init__(self, lifetime, sight):
 
         self.lifetime = lifetime
@@ -9,14 +9,17 @@ class Individual(Entity):
 
     # Represents an individual's action in one time step, given the circumstances
     def step(self, pos, env):
+        x, y = pos
         fov = self.field_of_vision(pos)
         if sees_food(fov):
             # Move towards food
             pass
         else:
-            env[pos] = 0
-            movement = random_movement(env.seed)
-            env[pos + movement] = self
+            new_x, new_y = random_movement(pos, env.seed)
+            if new_x < 0 or new_x > env.grid_size - 1 or new_y < 0 or new_y > env.grid_size - 1:
+                return
+            env.grid[x][y] = 0
+            env.grid[new_x][new_y] = self
 
     # Calculates field of vision for an individual relative to a given position
     def field_of_vision(self, pos):
@@ -41,17 +44,17 @@ def sees_food(area):
 
 
 
-def random_movement(seed):
-    np.random.seed(seed)
-    rand = np.random.randint(5)
+def random_movement(pos, seed):
+    x, y = pos
+    rand = np.random.randint(4)
     if rand == 0:
-        return [-1, 0]
+        return [x - 1, y]
     if rand == 1:
-        return [0, -1]
+        return [x, y - 1]
     if rand == 2:
-        return [1, 0]
+        return [x + 1, y]
     if rand == 3:
-        return [0, 1]
+        return [x, y + 1]
 
     print(f"unhandled movement: {rand}")
-    return [0, 0]
+    return [x, y]

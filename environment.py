@@ -3,7 +3,7 @@ import pygame.freetype
 import numpy as np
 from time import sleep
 from food import Food
-from entity.individual import Individual
+from individual import Individual
 
 class Environment:
     def __init__(self, grid_size=10, num_of_ind=5, num_of_food=10, ticks=1000, fps=10, seed=42):
