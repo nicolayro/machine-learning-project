@@ -2,21 +2,22 @@ import pygame
 import pygame.freetype
 import copy
 import numpy as np
+
+# Local
 from time import sleep
 from food import Food
 from individual import Individual
+import params
 
-# Simulation parameters
-ind_lifetime = 100
 
 class Environment:
-    def __init__(self, grid_size=30, num_of_ind=5, num_of_food=10, ticks=1000, fps=10, seed=42):
-        self.grid_size = grid_size
-        self.num_of_ind = num_of_ind
-        self.num_of_food = num_of_food
-        self.ticks = ticks
-        self.fps = fps
-        self.seed = seed
+    def __init__(self):
+        self.grid_size = params.GRID_SIZE
+        self.num_of_ind = params.NUM_IND
+        self.num_of_food = params.NUM_FOOD
+        self.ticks = params.TICKS
+        self.fps = params.FPS
+        self.seed = params.SEED
 
         self.init_variables()
     
@@ -109,7 +110,7 @@ def init_grid(env) -> list:
     y_values = env.rand.choice(range(env.grid_size), size=env.num_of_ind)
 
     for i in range(env.num_of_ind):
-        grid[x_values[i]][y_values[i]] = Individual(ind_lifetime, 5)
+        grid[x_values[i]][y_values[i]] = Individual(params.LIFETIME, params.SIGHT_RANGE)
     
     # Generate food
     x_values = env.rand.choice([x for x in range(env.grid_size) if x not in x_values], size=env.num_of_food)
