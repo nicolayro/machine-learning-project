@@ -1,17 +1,17 @@
 from food import Food
 
 
+# Class representing an individual.
 class Individual:
     def __init__(self, lifetime, sight):
-
         self.lifetime = lifetime
         self.sight = sight
 
     # Represents an individual's action in one time step, given the circumstances
     def step(self, pos, env):
         x, y = pos
-        fov = self.field_of_vision(pos)  # Find field of vision
-        food = find_food(fov, env)  #
+        fov = self.__field_of_vision(pos)  # Find field of vision
+        food = self.find_food(fov, env)  #
         print(food)
         if food:
             dist_x = food[0] - x
@@ -41,7 +41,7 @@ class Individual:
             env.grid[new_x][new_y] = self
 
         else:
-            new_x, new_y = random_pos(pos, env.rand)
+            new_x, new_y = self.random_pos(pos, env.rand)
             # Check out of bounds
             if new_x < 0 or new_x >= env.grid_size or new_y < 0 or new_y >= env.grid_size:
                 return
@@ -55,7 +55,7 @@ class Individual:
         self.lifetime -= 1
 
     # Calculates field of vision for an individual relative to a given position
-    def field_of_vision(self, pos):
+    def __field_of_vision(self, pos):
         # Returns coordinates for a circle
         circle = []
         X = int(self.sight + 1)
@@ -70,29 +70,32 @@ class Individual:
                 circle.append([pos[0] + x, pos[1] + y])
         return circle
 
+    # Looks for food in the given area, returns true if there is food
+    @staticmethod
+    def find_food(fov, env):
+        for x, y in fov:
+            # Check out of bounds
+            if x < 0 or x >= env.grid_size or y < 0 or y >= env.grid_size:
+                return
 
-# Looks for food in the given area, returns true if there is food
-def find_food(fov, env):
-    for x, y in fov:
-        # Check out of bounds
-        if x < 0 or x >= env.grid_size or y < 0 or y >= env.grid_size:
-            return
+            if isinstance(env.grid[x][y], Food):
+                return x, y
+        return None
 
-        if isinstance(env.grid[x][y], Food):
-            return x, y
-    return None
+    @staticmethod
+    def random_pos(pos, rand):
+        x, y = pos
+        rand = rand.integers(0, 4)
+        if rand == 0:
+            return [x - 1, y]
+        if rand == 1:
+            return [x, y - 1]
+        if rand == 2:
+            return [x + 1, y]
+        if rand == 3:
+            return [x, y + 1]
 
-def random_pos(pos, rand):
-    x, y = pos
-    rand = rand.integers(0, 4)
-    if rand == 0:
-        return [x - 1, y]
-    if rand == 1:
-        return [x, y - 1]
-    if rand == 2:
-        return [x + 1, y]
-    if rand == 3:
-        return [x, y + 1]
+        print(f"unhandled movement: {rand}")
+        return [x, y]
 
-    print(f"unhandled movement: {rand}")
-    return [x, y]
+
