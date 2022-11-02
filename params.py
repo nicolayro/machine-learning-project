@@ -1,0 +1,15 @@
+# Env
+GRID_SIZE = 40
+NUM_IND = 10
+NUM_FOOD = 40
+SEED = 50
+DAYS = 10
+
+# Render
+FPS = 30
+TICKS = 1000
+
+# Population
+LIFETIME = 300
+SIGHT_RANGE = 7  # Radius
+FOOD_NUTRITION = 50
