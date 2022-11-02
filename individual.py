@@ -1,98 +1,57 @@
 from food import Food
-
+import numpy as np
+import math
 
 class Individual:
-    def __init__(self, lifetime, sight):
-
+    def __init__(self, pos, lifetime, sight):
+        self.position = pos
         self.lifetime = lifetime
         self.sight = sight
+        self.move_speed = 0.2
 
     # Represents an individual's action in one time step, given the circumstances
-    def step(self, pos, env):
-        x, y = pos
-        fov = self.field_of_vision(pos)  # Find field of vision
-        food = find_food(fov, env)  #
-        print(food)
+    def step(self, env):
+        food = self.find_food(env)
+        
+        move_dir = (0.0, 0.0)
+
         if food:
-            dist_x = food[0] - x
-            dist_y = food[1] - y
-            new_x = x
-            new_y = y
-            if abs(dist_x) >= abs(dist_y):
-                print(dist_x / abs(dist_x))
-                new_x = int(x + (dist_x / abs(dist_x)))
-            else:
-                print(dist_y / abs(dist_y))
-                new_y = int(y + (dist_y / abs(dist_y)))
+            move_dir = (food.position[0] - self.position[0], food.position[1] - self.position[1])
+            move_dir_len = distBetween(food.position, self.position)
 
-            # Check out of bounds
-            if new_x < 0 or new_x >= env.grid_size or new_y < 0 or new_y >= env.grid_size:
-                return
-
-            # Check individual collision
-            if isinstance(env.grid[new_x][new_y], Individual):
-                return
-
-            # If new space is food, add to lifetime!
-            if isinstance(env.grid[new_x][new_y], Food):
-                self.lifetime += 50  # TODO: Hardcoded value
-
-            env.grid[x][y] = 0
-            env.grid[new_x][new_y] = self
-
+            if move_dir_len > self.move_speed:
+                move_dir = (move_dir[0] * self.move_speed / move_dir_len, move_dir[1] * self.move_speed / move_dir_len)
+            
+            if move_dir_len < (self.move_speed / 2):
+                env.foods.remove(food)
+                self.lifetime += food.nutrition
+            
+            
         else:
-            new_x, new_y = random_pos(pos, env.rand)
-            # Check out of bounds
-            if new_x < 0 or new_x >= env.grid_size or new_y < 0 or new_y >= env.grid_size:
-                return
+            angle = env.rand.random() * 2*math.pi
+            move_dir = (math.cos(angle) * self.move_speed, math.sin(angle) * self.move_speed)
+        
+        # Move if not going out of bounds
+        new_pos = (self.position[0] + move_dir[0], self.position[1] + move_dir[1])
+        if new_pos[0] > 0 and new_pos[0] < env.grid_size and new_pos[1] > 0 and new_pos[1] < env.grid_size:
+            self.position = new_pos
 
-            # Check individual collision
-            if isinstance(env.grid[new_x][new_y], Individual):
-                return
-
-            env.grid[x][y] = 0
-            env.grid[new_x][new_y] = self
         self.lifetime -= 1
 
-    # Calculates field of vision for an individual relative to a given position
-    def field_of_vision(self, pos):
-        # Returns coordinates for a circle
-        circle = []
-        X = int(self.sight + 1)
-        r = int(self.sight + 1)
-        for x in range(-X, X + 1):
-            Y = int((r * r - x * x) ** 0.5)
-            if Y == 0:
-                continue
-            if Y > self.sight:
-                Y = self.sight
-            for y in range(-Y, Y + 1):
-                circle.append([pos[0] + x, pos[1] + y])
-        return circle
+        if self.lifetime <= 0:
+            env.individuals.remove(self)
 
+    def find_food(self, env):
+        min_dist = self.sight
+        nearest_food = None
 
-# Looks for food in the given area, returns true if there is food
-def find_food(fov, env):
-    for x, y in fov:
-        # Check out of bounds
-        if x < 0 or x >= env.grid_size or y < 0 or y >= env.grid_size:
-            return
+        for food in env.foods:
+            dist = distBetween(self.position, food.position)
+            if dist < min_dist:
+                min_dist = dist
+                nearest_food = food
+        
+        return nearest_food
 
-        if isinstance(env.grid[x][y], Food):
-            return x, y
-    return None
-
-def random_pos(pos, rand):
-    x, y = pos
-    rand = rand.integers(0, 4)
-    if rand == 0:
-        return [x - 1, y]
-    if rand == 1:
-        return [x, y - 1]
-    if rand == 2:
-        return [x + 1, y]
-    if rand == 3:
-        return [x, y + 1]
-
-    print(f"unhandled movement: {rand}")
-    return [x, y]
+def distBetween(a, b) -> float:
+    return np.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
