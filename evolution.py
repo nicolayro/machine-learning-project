@@ -13,14 +13,15 @@ def eval_genomes(genomes, config):
     env.reset()
     for genome_id, genome in genomes:
         genome.fitness = 0
-    for i in range(50):
+    for i in range(300):
         for (genome_id, genome), indiv in zip(genomes, env.individuals):
             genome.fitness = 0
             net = neat.nn.FeedForwardNetwork.create(genome, config)
-            for inp in indiv.inputs():
-                output = net.activate(inp)
-                indiv.execute_action(output)
-            genome.fitness = env.grid_size - (env.grid_size - indiv.pos[0])
+            output = net.activate(indiv.inputs())
+            indiv.execute_action(output)
+            # genome.fitness = env.grid_size - (env.grid_size - indiv.pos[0])
+            if indiv.pos[0] > 0.9 * env.grid_size:
+                genome.fitness += 10
 
         if env.state % 50 == 49:
             env.render()
