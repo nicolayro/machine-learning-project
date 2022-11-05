@@ -11,6 +11,7 @@ import params
 
 class Environment:
     def __init__(self):
+        self.state = 0
         self.grid_size = params.GRID_SIZE
         self.num_of_ind = params.NUM_IND
         self.num_of_food = params.NUM_FOOD
@@ -40,7 +41,10 @@ class Environment:
         for indiv in self.individuals:
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
+            a = self.rand.random() * 2 * np.pi
             indiv.pos = (x, y)
+            indiv.angle = a
+            indiv.age = 0
 
     def step(self, ):
         for individual in self.individuals:

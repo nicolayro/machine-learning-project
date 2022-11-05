@@ -1,4 +1,3 @@
-from environment import Environment
 import os
 import evolution
 

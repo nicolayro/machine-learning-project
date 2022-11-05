@@ -11,6 +11,8 @@ env = Environment()
 # 2-input XOR inputs and expected outputs.
 def eval_genomes(genomes, config):
     env.reset()
+    for genome_id, genome in genomes:
+        genome.fitness = 0
     for i in range(50):
         for (genome_id, genome), indiv in zip(genomes, env.individuals):
             genome.fitness = 0
@@ -18,11 +20,13 @@ def eval_genomes(genomes, config):
             for inp in indiv.inputs():
                 output = net.activate(inp)
                 indiv.execute_action(output)
-            # genome.fitness = env.grid_size - (env.grid_size - indiv.pos[0])
-            if indiv.pos[0] > 9 * (env.grid_size / 10):
-                genome.fitness += 1
+            genome.fitness = env.grid_size - (env.grid_size - indiv.pos[0])
 
-        env.render()
+        if env.state % 50 == 49:
+            env.render()
+        # bad = [genome for (genome_id, genome) in genomes if genome.fitness is None]
+        # print(bad)
+    env.state += 1
 
 
 def run(config_file):
@@ -35,13 +39,13 @@ def run(config_file):
     p = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    # p.add_reporter(neat.StdOutReporter(True))
+    p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     # p.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
-    winner = p.run(eval_genomes, 100)
+    winner = p.run(eval_genomes, 1000)
 
     node_names = {-1: 'A', -2: 'B', 0: 'A XOR B'}
     visualize.plot_stats(stats, ylog=False, view=True)
