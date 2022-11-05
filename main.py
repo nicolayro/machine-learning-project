@@ -1,6 +1,11 @@
 from environment import Environment
+import os
+import evolution
 
 
 if __name__ == '__main__':
-    env = Environment()
-    env.render()
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config')
+
+    evolution.run(config_path)
+
