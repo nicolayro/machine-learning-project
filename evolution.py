@@ -13,7 +13,7 @@ def eval_genomes(genomes, config):
     env.reset()
     for genome_id, genome in genomes:
         genome.fitness = 0
-    for i in range(300):
+    for i in range(100):
         for (genome_id, genome), indiv in zip(genomes, env.individuals):
             genome.fitness = 0
             net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -23,8 +23,9 @@ def eval_genomes(genomes, config):
             if indiv.pos[0] > 0.9 * env.grid_size:
                 genome.fitness += 10
 
-        if env.state % 50 == 49:
-            env.render()
+        env.render()
+        # if env.state % 50 == 49:
+        #    env.render()
         # bad = [genome for (genome_id, genome) in genomes if genome.fitness is None]
         # print(bad)
     env.state += 1
@@ -43,14 +44,12 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    # p.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
     winner = p.run(eval_genomes, 1000)
 
-    node_names = {-1: 'A', -2: 'B', 0: 'A XOR B'}
-    visualize.plot_stats(stats, ylog=False, view=True)
-    visualize.plot_species(stats, view=True)
+    visualize.plot_stats(stats, ylog=False, view=True, filename="results/avg_fitness.svg")
+    visualize.plot_species(stats, view=True, filename="results/speciation.svg")
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 

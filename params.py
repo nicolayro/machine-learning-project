@@ -1,12 +1,12 @@
 # Env
-GRID_SIZE = 128
-NUM_IND = 1000
+GRID_SIZE = 32
+NUM_IND = 10
 NUM_FOOD = 0
 SEED = 50
 DAYS = 10
 
 # Render
-FPS = 30
+FPS = 1
 TICKS = 100
 
 # Population

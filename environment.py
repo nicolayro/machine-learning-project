@@ -42,6 +42,7 @@ class Environment:
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
             a = self.rand.random() * 2 * np.pi
+            print(a)
             indiv.pos = (x, y)
             indiv.angle = a
             indiv.age = 0
@@ -91,7 +92,25 @@ class Environment:
         # Draw individuals
         for individual in self.individuals:
             pos = individual.pos
-            pygame.draw.circle(self.screen, (220, 0, 0), (pos[0] * block_size, pos[1] * block_size), block_size / 2)
+            #pygame.draw.circle(self.screen, (220, 0, 0), (pos[0] * block_size, pos[1] * block_size), block_size / 2)
+
+            # TODO: Improve direction indicator
+            # eye = pygame.draw.circle(self.screen, (0, 0, 0), (pos[0] * block_size - block_size / 2, pos[1] * block_size), block_size / 6)
+
+            RED = (240, 50, 50)
+            WHITE = (255, 255, 255)
+            BLACK = (0, 0, 0)
+
+            radius = block_size
+            surface = pygame.Surface((radius, radius))
+            surface.set_colorkey((255, 0, 255))  # set it to some color you are not using
+            surface.fill((255, 0, 255))  # fill the surface with that color
+            pygame.draw.circle(surface, RED, (radius / 2, radius / 2), radius / 2)  # draw the circle in the correct color
+            pygame.draw.circle(surface, WHITE, (radius / 2, 3 * radius / 4), radius / 5)  # draw the circle in the correct color
+            pygame.draw.circle(surface, BLACK, (radius / 2, 3 * radius / 4), radius / 10)  # draw the circle in the correct color
+            surface = pygame.transform.rotate(surface, individual.angle * 57.296)
+            self.screen.blit(surface, (pos[0] * block_size, pos[1] * block_size))
+
 
     def _init_background(self) -> list:
         background = []
