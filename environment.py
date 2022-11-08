@@ -19,11 +19,11 @@ class Environment:
         self.fps = params.FPS
         self.seed = params.SEED
 
+        self.rand = np.random.default_rng(self.seed)
         self._init_variables()
         self._init_pygame()
 
     def _init_variables(self):
-        self.rand = np.random.default_rng(self.seed)
         self.background = self._init_background()
         self.individuals = self._init_individuals()
         self.foods = self._init_foods()
@@ -77,7 +77,7 @@ class Environment:
 
         # Draw food
         for food in self.foods:
-            food_x, food_y = food.position
+            food_x, food_y = food.pos
             rect = pygame.Rect(food_x * block_size, food_y * block_size, block_size + 1, block_size + 1)
             pygame.draw.rect(self.screen, (227, 206, 18), rect)
 
@@ -98,11 +98,11 @@ class Environment:
 
             # Create individual
             pygame.draw.circle(surface, red, (block_size / 2, block_size / 2), block_size / 2)  # draw the circle in the correct color
-            pygame.draw.circle(surface, white, (block_size / 2, 3 * block_size / 4), block_size / 5)  # draw the circle in the correct color
-            pygame.draw.circle(surface, black, (block_size / 2, 3 * block_size / 4), block_size / 10)  # draw the circle in the correct color
+            pygame.draw.circle(surface, white, (3 * block_size / 4, block_size / 2), block_size / 5)  # draw the circle in the correct color
+            pygame.draw.circle(surface, black, (3 * block_size / 4, block_size / 2), block_size / 10)  # draw the circle in the correct color
 
             # Rotate direction
-            surface = pygame.transform.rotate(surface, individual.angle * 57.296)  # convert to degrees
+            surface = pygame.transform.rotate(surface, individual.angle * - 57.296)  # convert to degrees
             self.screen.blit(surface, (pos[0] * block_size, pos[1] * block_size))
 
 
@@ -128,8 +128,8 @@ class Environment:
 
     def _init_foods(self) -> list:
         foods = []
-        x_values = self.rand.choice(range(1, self.grid_size - 1), size=self.num_of_food)
-        y_values = self.rand.choice(range(1, self.grid_size - 1), size=self.num_of_food)
+        x_values = self.rand.choice(range(2, self.grid_size - 2), size=self.num_of_food)
+        y_values = self.rand.choice(range(2, self.grid_size - 2), size=self.num_of_food)
 
         for i in range(self.num_of_food):
             foods.append(Food((x_values[i], y_values[i]), params.FOOD_NUTRITION))

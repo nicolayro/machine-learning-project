@@ -23,12 +23,12 @@ def eval_genomes(genomes, config):
             output = net.activate(indiv.inputs(env))
             indiv.execute_action(output)
             for food in env.foods:
-                if abs(indiv.pos[0] - food.position[0]) < 0.5 and abs(indiv.pos[1] - food.position[1]) < 0.5:
+                if abs(indiv.pos[0] - food.pos[0]) < 0.5 and abs(indiv.pos[1] - food.pos[1]) < 0.5:
                     indiv.energy += food.nutrition
                     env.foods.remove(food)
             genome.fitness = indiv.energy
 
-        if env.state % 100 == 0:
+        if (env.state + 1) % 40 == 0 or env.state == 0:
             env.render()
     env.state += 1
 
@@ -51,8 +51,8 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # Run for up to 100 generations.
-    winner = p.run(eval_genomes, 1000)
+    # Run for up to 400 generations.
+    winner = p.run(eval_genomes, 400)
 
     visualize.plot_stats(stats, ylog=False, view=True, filename="results/avg_fitness.svg")
     visualize.plot_species(stats, view=True, filename="results/speciation.svg")

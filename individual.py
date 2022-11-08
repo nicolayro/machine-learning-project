@@ -47,7 +47,7 @@ class Individual:
         nearest_food = None
 
         for food in env.foods:
-            dist = distBetween(self.position, food.position)
+            dist = distBetween(self.position, food.pos)
             if dist < min_dist:
                 min_dist = dist
                 nearest_food = food
