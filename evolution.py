@@ -1,7 +1,7 @@
 import os
 
 import neat
-
+import datetime
 import params
 import visualize
 
@@ -13,6 +13,7 @@ env = Environment()
 # 2-input XOR inputs and expected outputs.
 def eval_genomes(genomes, config):
     env.reset()
+    env.render()
 
     for genome_id, genome in genomes:
         genome.fitness = 0
@@ -28,10 +29,9 @@ def eval_genomes(genomes, config):
                     env.foods.remove(food)
             genome.fitness = indiv.energy
 
-        if env.state % 100 == 0:
+        if (env.state + 1) % 100 == 0:
             env.render()
     env.state += 1
-
 
 def run(config_file):
     # Load configuration.
@@ -51,11 +51,26 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # Run for up to 100 generations.
-    winner = p.run(eval_genomes, 1000)
+    # Run for up to n generations.
+    winner = p.run(eval_genomes, 10)
 
-    visualize.plot_stats(stats, ylog=False, view=True, filename="results/avg_fitness.svg")
-    visualize.plot_species(stats, view=True, filename="results/speciation.svg")
+    node_names = {
+        -5: "age",
+        -4: "angle to food",
+        -3: "angle",
+        -2: "in speed",
+        -1: "constant",
+        0: "out speed",
+        1: "turn",
+    }
+
+    now = datetime.datetime.now()
+    datestr = "%s%s%s_%s%s" % (now.year, now.month, now.day, now.hour, now.minute)
+
+    visualize.plot_stats(stats, ylog=False, view=True, filename=("results/avg_fitness_" + datestr + ".svg"))
+    visualize.plot_species(stats, view=True, filename=("results/speciation_" + datestr + ".svg"))
+    visualize.draw_net(config, winner, view=True, node_names=node_names, filename=("results/neural_net_" + datestr), fmt="png")
+
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 

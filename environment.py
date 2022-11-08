@@ -31,7 +31,7 @@ class Environment:
 
     def _init_pygame(self):
         pygame.init()
-        self.screen_size = 800
+        self.screen_size = 700
         self.screen = pygame.display.set_mode((self.screen_size, self.screen_size))
         pygame.display.set_caption("Gridworld")
         self.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
@@ -98,11 +98,11 @@ class Environment:
 
             # Create individual
             pygame.draw.circle(surface, red, (block_size / 2, block_size / 2), block_size / 2)  # draw the circle in the correct color
-            pygame.draw.circle(surface, white, (block_size / 2, 3 * block_size / 4), block_size / 5)  # draw the circle in the correct color
-            pygame.draw.circle(surface, black, (block_size / 2, 3 * block_size / 4), block_size / 10)  # draw the circle in the correct color
+            pygame.draw.circle(surface, white, (3 * block_size / 4, block_size / 2), block_size / 5)  # draw the circle in the correct color
+            pygame.draw.circle(surface, black, (3 * block_size / 4, block_size / 2), block_size / 10)  # draw the circle in the correct color
 
             # Rotate direction
-            surface = pygame.transform.rotate(surface, individual.angle * 57.296)  # convert to degrees
+            surface = pygame.transform.rotate(surface, individual.angle * -57.296)  # convert to degrees
             self.screen.blit(surface, (pos[0] * block_size, pos[1] * block_size))
 
 
@@ -122,7 +122,7 @@ class Environment:
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
             angle = self.rand.random() * 2 * np.pi
-            individuals.append(Indiv((x, y), angle, 1))
+            individuals.append(Indiv((x, y), angle))
 
         return individuals
 
