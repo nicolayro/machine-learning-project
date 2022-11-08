@@ -37,15 +37,7 @@ class Environment:
         self.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
 
     def reset(self):
-        # self._init_variables()
-        for indiv in self.individuals:
-            x = self.rand.random() * (self.grid_size - 1) + 0.5
-            y = self.rand.random() * (self.grid_size - 1) + 0.5
-            a = self.rand.random() * 2 * np.pi
-            print(a)
-            indiv.pos = (x, y)
-            indiv.angle = a
-            indiv.age = 0
+        self._init_variables()
 
     def step(self, ):
         for individual in self.individuals:
@@ -92,23 +84,25 @@ class Environment:
         # Draw individuals
         for individual in self.individuals:
             pos = individual.pos
-            #pygame.draw.circle(self.screen, (220, 0, 0), (pos[0] * block_size, pos[1] * block_size), block_size / 2)
 
-            # TODO: Improve direction indicator
-            # eye = pygame.draw.circle(self.screen, (0, 0, 0), (pos[0] * block_size - block_size / 2, pos[1] * block_size), block_size / 6)
+            # TODO: Optimize :)
+            value = min(255, max(0, individual.energy))
+            red = (value, 0, 0)
+            white = (255, 255, 255)
+            black = (0, 0, 0)
+            surface = pygame.Surface((block_size, block_size))
 
-            RED = (240, 50, 50)
-            WHITE = (255, 255, 255)
-            BLACK = (0, 0, 0)
+            # Transparent square
+            surface.set_colorkey((255, 0, 255))
+            surface.fill((255, 0, 255))
 
-            radius = block_size
-            surface = pygame.Surface((radius, radius))
-            surface.set_colorkey((255, 0, 255))  # set it to some color you are not using
-            surface.fill((255, 0, 255))  # fill the surface with that color
-            pygame.draw.circle(surface, RED, (radius / 2, radius / 2), radius / 2)  # draw the circle in the correct color
-            pygame.draw.circle(surface, WHITE, (radius / 2, 3 * radius / 4), radius / 5)  # draw the circle in the correct color
-            pygame.draw.circle(surface, BLACK, (radius / 2, 3 * radius / 4), radius / 10)  # draw the circle in the correct color
-            surface = pygame.transform.rotate(surface, individual.angle * 57.296)
+            # Create individual
+            pygame.draw.circle(surface, red, (block_size / 2, block_size / 2), block_size / 2)  # draw the circle in the correct color
+            pygame.draw.circle(surface, white, (block_size / 2, 3 * block_size / 4), block_size / 5)  # draw the circle in the correct color
+            pygame.draw.circle(surface, black, (block_size / 2, 3 * block_size / 4), block_size / 10)  # draw the circle in the correct color
+
+            # Rotate direction
+            surface = pygame.transform.rotate(surface, individual.angle * 57.296)  # convert to degrees
             self.screen.blit(surface, (pos[0] * block_size, pos[1] * block_size))
 
 
@@ -127,15 +121,15 @@ class Environment:
         for i in range(self.num_of_ind):
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
-            angle = self.rand.random()
+            angle = self.rand.random() * 2 * np.pi
             individuals.append(Indiv((x, y), angle, 1))
 
         return individuals
 
     def _init_foods(self) -> list:
         foods = []
-        x_values = self.rand.choice(range(self.grid_size), size=self.num_of_food)
-        y_values = self.rand.choice(range(self.grid_size), size=self.num_of_food)
+        x_values = self.rand.choice(range(1, self.grid_size - 1), size=self.num_of_food)
+        y_values = self.rand.choice(range(1, self.grid_size - 1), size=self.num_of_food)
 
         for i in range(self.num_of_food):
             foods.append(Food((x_values[i], y_values[i]), params.FOOD_NUTRITION))
