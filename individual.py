@@ -2,6 +2,8 @@ from food import Food
 import numpy as np
 import math
 
+
+# Deprecated
 class Individual:
     def __init__(self, pos, lifetime, sight):
         self.position = pos
@@ -25,7 +27,6 @@ class Individual:
             if move_dir_len < (self.move_speed / 2):
                 env.foods.remove(food)
                 self.lifetime += food.nutrition
-            
             
         else:
             angle = env.rand.random() * 2*math.pi
