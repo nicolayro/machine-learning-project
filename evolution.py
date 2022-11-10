@@ -21,14 +21,14 @@ def eval_genomes(genomes, config):
         for (genome_id, genome), indiv in zip(genomes, env.individuals):
             net = neat.nn.FeedForwardNetwork.create(genome, config)
             output = net.activate(indiv.inputs(env))
-            indiv.execute_action(output)
+            indiv.execute_actions(output)
             for food in env.foods:
                 if abs(indiv.pos[0] - food.pos[0]) < 0.5 and abs(indiv.pos[1] - food.pos[1]) < 0.5:
                     indiv.energy += food.nutrition
                     env.foods.remove(food)
             genome.fitness = indiv.energy
 
-        if (env.state + 1) % 40 == 0 or env.state == 0:
+        if (env.state + 1) % 100 == 0 or env.state == 0:
             env.render()
     env.state += 1
 
@@ -50,14 +50,28 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
+    p.add_reporter(neat.Checkpointer(5, filename_prefix="results/neat-checkpoint"))
 
     # Run for up to 400 generations.
-    winner = p.run(eval_genomes, 400)
+    winner = p.run(eval_genomes, 10)
 
+    print('\nBest genome:\n{!s}'.format(winner))
+
+    node_names = {
+        -1: "angle",
+        -2: "energy",
+        -3: "random",
+        -4: "constant",
+        -5: "angle_food",
+        -6: "dist_food",
+        0: "forward",
+        1: "turn left",
+        2: "turn right"
+    }
+    # Display the winning genome.
+    visualize.draw_net(config, winner, True, node_names=node_names, filename="results/brain")
     visualize.plot_stats(stats, ylog=False, view=True, filename="results/avg_fitness.svg")
     visualize.plot_species(stats, view=True, filename="results/speciation.svg")
-    # Display the winning genome.
-    print('\nBest genome:\n{!s}'.format(winner))
 
 
 if __name__ == '__main__':

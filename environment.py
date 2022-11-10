@@ -122,7 +122,7 @@ class Environment:
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
             angle = self.rand.random() * 2 * np.pi
-            individuals.append(Indiv((x, y), angle, 1))
+            individuals.append(Indiv((x, y), angle))
 
         return individuals
 

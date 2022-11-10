@@ -1,43 +1,47 @@
 import params
 import numpy as np
 
+index_to_action = ['MOVE_FORWARD', 'TURN_LEFT', 'TURN_RIGHT']
+
 
 # Individual in the environment
 class Indiv:
-    MAX_ENERGY = params.EPISODE_LENGTH
-    SIGHT_RANGE = params.SIGHT_RANGE
-    SPEED = params.SPEED
+    # Some initial values
+    max_energy = params.EPISODE_LENGTH
+    sight_range = params.SIGHT_RANGE
+    speed = params.SPEED
+    angular_speed = params.ANGULAR_SPEED
 
-    def __init__(self, pos, angle, speed):
+    def __init__(self, pos, angle):
         # Inputs
         self.pos = pos
         self.angle = angle
-        self.speed = speed
 
         self.age = 0
-        self.energy = self.MAX_ENERGY
+        self.energy = self.max_energy
 
     def inputs(self, env):
         # Normalize values
-        pos_x = self._normalize(self.pos[0], params.GRID_SIZE)
-        pos_y = self._normalize(self.pos[1], params.GRID_SIZE)
+        # pos_x = self._normalize(self.pos[0], params.GRID_SIZE)
+        # pos_y = self._normalize(self.pos[1], params.GRID_SIZE)
         angle = self._normalize(self.angle, 2 * np.pi)
-        age = self._normalize(self.age, params.EPISODE_LENGTH)
-        energy = self._normalize(self.energy, self.MAX_ENERGY)
+        # age = self._normalize(self.age, params.EPISODE_LENGTH)
+        energy = self._normalize(self.energy, self.max_energy)
         random = np.random.random()
 
         # Relative position of the nearest food
-        food_dist, food_angle = self._find_nearest(env.foods, self.SIGHT_RANGE)
-        indiv_dist, indiv_angle = self._find_nearest(env.individuals, self.SIGHT_RANGE)
+        food_dist, food_angle = self._find_nearest(env.foods, self.sight_range)
+        indiv_dist, indiv_angle = self._find_nearest(env.individuals, self.sight_range)
 
         food_angle = self._normalize(food_angle, 2 * np.pi)
-        food_dist = self._normalize(food_dist, self.SIGHT_RANGE)
-        indiv_dist = self._normalize(indiv_dist, 2 * np.pi)
-        indiv_angle = self._normalize(indiv_angle, self.SIGHT_RANGE)
+        food_dist = self._normalize(food_dist, self.sight_range)
+        # indiv_dist = self._normalize(indiv_dist, 2 * np.pi)
+        # indiv_angle = self._normalize(indiv_angle, self.sight_range)
 
-        return pos_x, pos_y, angle, age, energy, random, 1, food_angle, food_dist, indiv_angle, indiv_dist
+        return angle, energy, random, 1, food_angle, food_dist
+        # return pos_x, pos_y, angle, age, energy, random, 1, food_angle, food_dist, indiv_angle, indiv_dist
 
-    def execute_action(self, action):
+    def execute_actions(self, outputs):
         self.energy -= 1
         self.age += 1
 
@@ -45,9 +49,28 @@ class Indiv:
         if self.energy <= 0:
             return
 
-        # Add the vectors to the position
-        speed = action[0] * self.SPEED
-        angle = self.angle + (action[1] - action[2]) * np.pi / 2
+        # Handle actions
+        actions = []
+        for index, output in enumerate(outputs):
+            if output > np.random.random():
+                actions.append(index_to_action[index])
+        self._execute_actions(actions)
+
+    def _execute_actions(self, actions):
+        speed = 0
+        angle = self.angle
+
+        # Handle actions
+        if 'MOVE_FORWARD' in actions:
+            speed = self.speed
+
+        if 'TURN_LEFT' in actions:
+            angle -= self.angular_speed
+
+        if 'TURN_RIGHT' in actions:
+            angle += self.angular_speed
+
+        # Calculate new position
         new_pos = (self.pos[0] + speed * np.cos(angle), self.pos[1] + speed * np.sin(angle))
 
         # Check x
