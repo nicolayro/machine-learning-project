@@ -7,10 +7,10 @@ from renderer import Renderer
 
 
 class Environment:
-    grid_size   = 64    # Size of the world
-    pop_size    = 80   # Initial population size
-    num_food    = 100   # Initial amount of food
-    nutrition   = 200   # Food nutrition
+    grid_size   = 256    # Size of the world
+    pop_size    = 200   # Initial population size
+    num_food    = 1000   # Initial amount of food
+    nutrition   = 400   # Food nutrition
     steps       = 200   # Number of time steps per generation
 
     agents = []
@@ -22,6 +22,7 @@ class Environment:
         self.renderer = Renderer(self.grid_size)
 
     def evaluate_genomes(self, genomes, config):
+        self.state += 1
         self.agents = []
         self.foods = []
         # Initialize
@@ -52,7 +53,8 @@ class Environment:
                 self.foods = new_foods
 
             # Render world to screen
-            self.renderer.render(self)
+            if self.state % 50 == 0:
+                self.renderer.render(self)
 
         # Evaluate
         for (genome_id, genome), agent in zip(genomes, self.agents):

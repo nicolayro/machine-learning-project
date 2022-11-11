@@ -4,10 +4,10 @@ PI2 = 2 * np.pi
 
 
 class Agent:
-    energy              = 100   # Initial energy
-    velocity            = 0.5   # Movement speed
+    energy              = 300   # Initial energy
+    velocity            = 0.1   # Movement speed
     angular_velocity    = 0.2   # Rotation speed
-    sight_range         = 14    # View distance in world
+    sight_range         = 50    # View distance in world
 
     def __init__(self, x, y, a, net):
         self.x = x
@@ -51,7 +51,7 @@ class Agent:
         self.y = new_y
         self.angle = angle % PI2
         self.age += 1
-        self.energy -= 1 + speed
+        self.energy -= 1 + speed ** 2
 
     def normalized_inputs(self, env):
         const = 1

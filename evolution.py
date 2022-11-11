@@ -4,7 +4,6 @@ import random
 
 import visualize
 import environment
-import renderer
 
 # Seeding
 seed = 42
@@ -26,7 +25,7 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(5, filename_prefix="results/neat-checkpoint"))
+    p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
     # Run for up to 400 generations.
     winner = p.run(env.evaluate_genomes, 100)
@@ -34,12 +33,14 @@ def run(config_file):
     print('\nBest genome:\n{!s}'.format(winner))
 
     node_names = {
-        -1: "angle",
-        -2: "energy",
-        -3: "random",
-        -4: "constant",
-        -5: "angle_food",
-        -6: "dist_food",
+        -1: "const",
+        -2: "random",
+        -3: "x",
+        -4: "y",
+        -5: 'angle',
+        -6: 'age',
+        -7: "angle_food",
+        -8: "dist_food",
         0: "forward",
         1: "turn left",
         2: "turn right"
