@@ -6,9 +6,9 @@ from renderer import Renderer
 
 
 class Environment:
-    grid_size   = 64    # Size of the world
+    grid_size   = 80    # Size of the world
     pop_size    = 60    # Initial population size
-    num_food    = 80    # Initial amount of food
+    num_food    = 100    # Initial amount of food
     nutrition   = 200   # Food nutrition
     steps       = 400   # Number of time steps per generation
 
@@ -52,7 +52,7 @@ class Environment:
                 self.foods = new_foods
 
             # Render world to screen
-            if self.state % 50 == 0:
+            if self.state % 100 == 0:
                 self.renderer.render(self)
 
         # Evaluate

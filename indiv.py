@@ -1,21 +1,19 @@
-import params
 import numpy as np
-
-import params
 
 # Individual in the environment
 class Indiv:
-    energy              = 300   # Initial energy
+    max_energy          = 300   # Initial energy
     move_speed          = 0.3   # Movement speed
     angular_speed       = 0.2   # Rotation speed
     sight_range         = 25    # View distance in world
+    move_cost           = 4     # Energy cost of moving one tile
 
     def __init__(self, x, y, angle, net):
         self.x = x
         self.y = y
         self.angle = angle
         self.net = net
-
+        self.energy = self.max_energy
         self.speed = 0
         self.age = 0
 
@@ -23,9 +21,12 @@ class Indiv:
         const = 1
         speed = self.speed / self.move_speed
         angle = self.angle / np.pi
-        angle_to_food = self._find_nearest(env.foods) / (np.pi * 2)
+        dist_to_food, angle_to_food = self._find_nearest(env.foods)
+        dist_to_food /= self.sight_range
+        angle_to_food /= (np.pi * 2)
         age = self.age / env.steps
-        return const, speed, angle, angle_to_food, age
+        energy = self.energy / self.max_energy
+        return const, speed, angle, dist_to_food, angle_to_food, age, energy
     
     def step(self, env):
         self.energy -= 1
@@ -58,27 +59,26 @@ class Indiv:
 
         self.speed = speed
         self.angle = angle
-        self.energy -= speed ** 2
+        self.energy -= (speed ** 2) * self.move_cost
 
     def _find_nearest(self, values):
-        nodes = np.asarray(values)
-        dist_2 = np.sum((nodes - (self.x, self.y)) ** 2, axis=1)
+        if values.size == 0:
+            return self.sight_range, 0
 
-        if dist_2.size == 0:
-            return 0
+        dist_2 = np.sum((values - (self.x, self.y)) ** 2, axis=1)
 
         nearest = np.argmin(dist_2)
-        x, y = nodes[nearest]
+        x, y = values[nearest]
         min_dist = np.sqrt(dist_2[nearest])
 
         # Return if the nearest entity is outside of view distance
         if min_dist > self.sight_range:
-            return 0
+            return self.sight_range, 0
 
         # Calculate angle
         x -= self.x
         y -= self.y
         angle = np.arctan2(y, x)
 
-        return self.angle - angle
+        return min_dist, (self.angle - angle)
     

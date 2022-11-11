@@ -24,17 +24,18 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
     # Run for up to n generations.
-    winner = p.run(env.evaluate_genomes, 4)
+    winner = p.run(env.evaluate_genomes, 400)
 
     node_names = {
         -1: "constant",
         -2: "in speed",
         -3: "angle",
-        -4: "angle to food",
-        -5: "age",
+        -4: "dist to food",
+        -5: "angle to food",
+        -6: "age",
+        -7: "energy",
         0: "out speed",
         1: "turn",
     }

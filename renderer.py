@@ -4,7 +4,7 @@ from time import sleep
 
 
 class Renderer:
-    screen_size = 800  # Height/Width of window in pixels
+    screen_size = 700  # Height/Width of window in pixels
     fps         = 0    # Target frames per second
 
     def __init__(self, grid_size):
@@ -58,7 +58,6 @@ class Renderer:
             value = min(255, max(0, agent.energy))
             red = (value, 0, 0)
             white = (255, 255, 255)
-            black = (0, 0, 0)
             surface = pygame.Surface((block_size, block_size))
 
             # Transparent square
@@ -68,7 +67,6 @@ class Renderer:
             # Create individual
             pygame.draw.circle(surface, red, (block_size / 2, block_size / 2), block_size / 2)
             pygame.draw.circle(surface, white, (3 * block_size / 4, block_size / 2), block_size / 5)
-            pygame.draw.circle(surface, black, (3 * block_size / 4, block_size / 2), block_size / 10)
 
             # Rotate direction
             surface = pygame.transform.rotate(surface, agent.angle * - 57.296)  # convert to degrees
