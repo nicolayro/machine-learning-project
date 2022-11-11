@@ -19,6 +19,9 @@ class Agent:
 
     # Move one step in time
     def step(self, env):
+        self.age += 1
+        self.energy -= 1
+
         # If the individual is out of energy, don't do anything
         if self.energy <= 0:
             return
@@ -43,21 +46,19 @@ class Agent:
             angle += self.angular_velocity
 
         # Calculate new position
-        new_x = min(max(0, self.x + speed * np.cos(angle)), env.grid_size - 1)
-        new_y = min(max(0, self.y + speed * np.sin(angle)), env.grid_size - 1)
+        self.x = min(max(0, self.x + speed * np.cos(angle)), env.grid_size - 1)
+        self.y = min(max(0, self.y + speed * np.sin(angle)), env.grid_size - 1)
 
         # Assign new values
-        self.x = new_x
-        self.y = new_y
         self.angle = angle % PI2
         self.age += 1
-        self.energy -= 1 + speed ** 2
+        self.energy -= speed ** 2
 
     def normalized_inputs(self, env):
         const = 1
         random = np.random.random()
-        x = self.normalize(self.x, 0, env.grid_size - 1)
-        y = self.normalize(self.y, 0, env.grid_size - 1)
+        # x = self.normalize(self.x, 0, env.grid_size - 1)
+        # y = self.normalize(self.y, 0, env.grid_size - 1)
         angle = self.normalize(self.angle, 0, PI2)
         age = self.normalize(self.angle, 0, env.steps)
 
@@ -66,7 +67,7 @@ class Agent:
         food_dist = self.normalize(food_dist, 0, self.sight_range)
         food_angle = self.normalize(food_angle, 0, PI2)
 
-        return const, random, x, y, angle, age, food_dist, food_angle
+        return const, random, angle, age, food_dist, food_angle
 
     # Finds the nearest entity from a list of entities
     #   values: list of entities
@@ -85,8 +86,9 @@ class Agent:
 
         # Calculate angle
         x -= self.x
-        y += self.y
+        y -= self.y
         angle = np.arctan2(y, x)
+        angle = self.angle - angle
 
         return min_dist, angle
 
