@@ -36,8 +36,10 @@ def run(config_file):
         -5: "angle to food",
         -6: "age",
         -7: "energy",
+        -8: "grass nutrition",
         0: "out speed",
         1: "turn",
+        2: "eat grass"
     }
 
     now = datetime.datetime.now()

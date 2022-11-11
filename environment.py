@@ -8,12 +8,15 @@ from renderer import Renderer
 class Environment:
     grid_size   = 80    # Size of the world
     pop_size    = 60    # Initial population size
-    num_food    = 100    # Initial amount of food
+    num_food    = 100   # Initial amount of food
     nutrition   = 200   # Food nutrition
     steps       = 400   # Number of time steps per generation
+    grass_nutrition = 2 # Grass nutrition from eating
+    grass_factor = 4    # How much tile value decreases when eating
 
     agents = []
     foods = []
+    grass = []
 
     def __init__(self, seed):
         self.rand = np.random.default_rng(seed)
@@ -38,7 +41,8 @@ class Environment:
             self.agents.append(agent)
 
         # Simulate
-        self.foods = self.rand.random((self.num_food, 2)) * (self.grid_size - 4) + 2  # Spawn food
+        self.foods = self.rand.random((self.num_food, 2)) * (self.grid_size - 4) + 2    # Spawn food
+        self.grass = self.rand.random((self.grid_size, self.grid_size)) * 100 + 30      # Spawn grass
         for i in range(self.steps):
             for agent in self.agents:
                 # Agent acts
@@ -52,11 +56,30 @@ class Environment:
                 self.foods = new_foods
 
             # Render world to screen
-            if self.state % 100 == 0:
+            if self.state % 50 == 0:
                 self.renderer.render(self)
 
         # Evaluate
         for (genome_id, genome), agent in zip(genomes, self.agents):
             genome.fitness = agent.energy
 
+    def get_normalized_nutrition(self, agent: Indiv) -> float:
+        x = int(round(agent.x))
+        y = int(round(agent.y))
 
+        return self.grass[x][y] / 130
+
+    def eat_grass(self, agent: Indiv) -> float:
+        x = int(round(agent.x))
+        y = int(round(agent.y))
+
+        tile_value = self.grass[x][y]
+        eat_amount = self.grass_nutrition * self.grass_factor
+
+        if tile_value >= eat_amount:
+            self.grass[x][y] -= eat_amount
+            return self.grass_nutrition
+        else:
+            value = self.grass[x][y]
+            self.grass[x][y] = 0
+            return value / self.grass_factor

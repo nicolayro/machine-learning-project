@@ -14,7 +14,6 @@ class Renderer:
         self.font = pygame.freetype.Font("./assets/VCR_OSD_MONO.ttf", 24)
 
         self.grid_size = grid_size
-        self.background = self._init_background()
         self.tick = 0
 
     def render(self, env):
@@ -38,9 +37,9 @@ class Renderer:
         for x in range(env.grid_size):
             for y in range(env.grid_size):
 
-                # Draw background
+                # Draw grass
                 rect = pygame.Rect(x * block_size, y * block_size, block_size + 1, block_size + 1)
-                pygame.draw.rect(self.screen, (0, self.background[x][y], 0), rect)
+                pygame.draw.rect(self.screen, (0, env.grass[x][y] + 100, 0), rect)
 
                 # Render text
                 self.font.render_to(self.screen, (10, self.screen_size - 24), str(self.tick), (0, 0, 0))
@@ -55,7 +54,7 @@ class Renderer:
         for agent in env.agents:
 
             # TODO: Optimize :)
-            value = min(255, max(0, agent.energy))
+            value = min(255, max(0, (agent.energy * 255) / agent.max_energy))
             red = (value, 0, 0)
             white = (255, 255, 255)
             surface = pygame.Surface((block_size, block_size))
@@ -71,14 +70,3 @@ class Renderer:
             # Rotate direction
             surface = pygame.transform.rotate(surface, agent.angle * - 57.296)  # convert to degrees
             self.screen.blit(surface, (agent.x * block_size, agent.y * block_size))
-
-    def _init_background(self):
-        background = []
-        for x in range(self.grid_size):
-            column = []
-            for y in range(self.grid_size):
-                column.append(np.random.randint(150, 220))
-            background.append(column)
-
-        return background
-

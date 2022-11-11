@@ -26,13 +26,14 @@ class Indiv:
         angle_to_food /= (np.pi * 2)
         age = self.age / env.steps
         energy = self.energy / self.max_energy
-        return const, speed, angle, dist_to_food, angle_to_food, age, energy
+        grass_nutrition = env.get_normalized_nutrition(self)
+
+        return const, speed, angle, dist_to_food, angle_to_food, age, energy, grass_nutrition
     
     def step(self, env):
         self.energy -= 1
-        self.age += 1
 
-        # If the individual is out of food, don't do anything
+        # If the individual is out of energy, don't do anything
         if self.energy <= 0:
             return
         
@@ -44,22 +45,30 @@ class Indiv:
         speed = ((actions[0] + 1) / 2) * self.move_speed
         angle = self.angle + actions[1] * self.angular_speed
 
-        new_x = self.x + speed * np.cos(angle)
-        new_y = self.y + speed * np.sin(angle)
+        # Stop to eat the grass if triggered
+        if actions[2] > 0.5:
+            speed = 0
+            angle = self.angle
+            self.energy += env.eat_grass(self)
+        else:
+            # Move agent
+            new_x = self.x + speed * np.cos(angle)
+            new_y = self.y + speed * np.sin(angle)
 
-        # Wrap around angle
-        if angle > np.pi:
-            angle -= np.pi * 2
-        elif angle < -np.pi:
-            angle += np.pi * 2
+            # Wrap around angle
+            if angle > np.pi:
+                angle -= np.pi * 2
+            elif angle < -np.pi:
+                angle += np.pi * 2
 
-        # Clamp position
-        self.x = min(max(0, new_x), env.grid_size - 1)
-        self.y = min(max(0, new_y), env.grid_size - 1)
+            # Clamp position
+            self.x = min(max(0, new_x), env.grid_size - 1)
+            self.y = min(max(0, new_y), env.grid_size - 1)
 
         self.speed = speed
         self.angle = angle
         self.energy -= (speed ** 2) * self.move_cost
+        self.age += 1
 
     def _find_nearest(self, values):
         if values.size == 0:
