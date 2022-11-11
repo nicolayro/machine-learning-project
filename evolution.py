@@ -52,14 +52,14 @@ def run(config_file):
     p.add_reporter(stats)
 
     # Run for up to n generations.
-    winner = p.run(eval_genomes, 10)
+    winner = p.run(eval_genomes, 400)
 
     node_names = {
-        -5: "age",
-        -4: "angle to food",
-        -3: "angle",
-        -2: "in speed",
         -1: "constant",
+        -2: "in speed",
+        -3: "angle",
+        -4: "angle to food",
+        -5: "age",
         0: "out speed",
         1: "turn",
     }
