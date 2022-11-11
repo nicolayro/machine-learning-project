@@ -1,47 +1,22 @@
 import os
-
 import neat
 import datetime
+import random
 import params
 import visualize
+import environment
 
-from environment import Environment
-
-env = Environment()
-
-
-# 2-input XOR inputs and expected outputs.
-def eval_genomes(genomes, config):
-    env.reset()
-    env.render()
-
-    for genome_id, genome in genomes:
-        genome.fitness = 0
-
-    for i in range(params.EPISODE_LENGTH):
-        for (genome_id, genome), indiv in zip(genomes, env.individuals):
-            net = neat.nn.FeedForwardNetwork.create(genome, config)
-            output = net.activate(indiv.inputs(env))
-            indiv.execute_action(output)
-            for food in env.foods:
-                if abs(indiv.pos[0] - food.position[0]) < 0.5 and abs(indiv.pos[1] - food.position[1]) < 0.5:
-                    indiv.energy += food.nutrition
-                    env.foods.remove(food)
-            genome.fitness = indiv.energy
-
-        if (env.state + 1) % 100 == 0:
-            env.render()
-    env.state += 1
+# Seeding
+seed = 42
+random.seed(seed)
+env = environment.Environment(seed)
 
 def run(config_file):
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
-
-    config.pop_size = params.NUM_IND
-    config.fitness_threshold = params.FITNESS_THRESHOLD
-    print(f"config: {config.pop_size}")
+    config.pop_size = env.pop_size
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
@@ -50,6 +25,10 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
+    p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
+
+    # Run for up to 400 generations.
+    winner = p.run(env.evaluate_genomes, 100)
 
     # Run for up to n generations.
     winner = p.run(eval_genomes, 400)
