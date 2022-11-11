@@ -5,9 +5,9 @@ PI2 = 2 * np.pi
 
 class Agent:
     energy              = 300   # Initial energy
-    velocity            = 0.1   # Movement speed
-    angular_velocity    = 0.2   # Rotation speed
-    sight_range         = 50    # View distance in world
+    velocity            = 1.0   # Movement speed
+    angular_velocity    = 1.0   # Rotation speed
+    sight_range         = 25    # View distance in world
 
     def __init__(self, x, y, a, net):
         self.x = x
