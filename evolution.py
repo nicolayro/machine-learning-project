@@ -1,7 +1,7 @@
 import os
 import neat
+import datetime
 import random
-
 import visualize
 import environment
 
@@ -9,7 +9,6 @@ import environment
 seed = 42
 random.seed(seed)
 env = environment.Environment(seed)
-
 
 def run(config_file):
     # Load configuration.
@@ -27,28 +26,30 @@ def run(config_file):
     p.add_reporter(stats)
     p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
-    # Run for up to 400 generations.
-    winner = p.run(env.evaluate_genomes, 100)
-
-    print('\nBest genome:\n{!s}'.format(winner))
+    # Run for up to n generations.
+    winner = p.run(env.evaluate_genomes, 4)
 
     node_names = {
-        -1: "const",
-        -2: "random",
-        -3: "x",
-        -4: "y",
-        -5: 'angle',
-        -6: 'age',
-        -7: "angle_food",
-        -8: "dist_food",
-        0: "forward",
-        1: "turn left",
-        2: "turn right"
+        -1: "constant",
+        -2: "in speed",
+        -3: "angle",
+        -4: "angle to food",
+        -5: "age",
+        0: "out speed",
+        1: "turn",
     }
+
+    now = datetime.datetime.now()
+    datestr = "%s%s%s_%s%s" % (now.year, now.month, now.day, now.hour, now.minute)
+
+    os.mkdir("results/" + datestr)
+
+    visualize.plot_stats(stats, ylog=False, view=True, filename=("results/" + datestr + "/avg_fitness_" + datestr + ".svg"))
+    visualize.plot_species(stats, view=True, filename=("results/" + datestr + "/speciation_" + datestr + ".svg"))
+    visualize.draw_net(config, winner, view=True, node_names=node_names, filename=("results/" + datestr +"/neural_net_" + datestr), fmt="png")
+
     # Display the winning genome.
-    visualize.draw_net(config, winner, True, node_names=node_names, filename="results/brain")
-    visualize.plot_stats(stats, ylog=False, view=True, filename="results/avg_fitness.svg")
-    visualize.plot_species(stats, view=True, filename="results/speciation.svg")
+    print('\nBest genome:\n{!s}'.format(winner))
 
 
 if __name__ == '__main__':

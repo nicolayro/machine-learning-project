@@ -9,7 +9,7 @@ reset_on_extinction     = True
 # node activation options
 activation_default      = tanh
 activation_mutate_rate  = 0.0
-activation_options      = tanh clamped sigmoid relu softplus
+activation_options      = tanh
 
 # node aggregation options
 aggregation_default     = sum
@@ -46,8 +46,8 @@ node_delete_prob        = 0.2
 
 # network parameters
 num_hidden              = 0
-num_inputs              = 8
-num_outputs             = 3
+num_inputs              = 5
+num_outputs             = 2
 
 # node response options
 response_init_mean      = 1.0
