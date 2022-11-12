@@ -5,8 +5,6 @@ PI2 = 2 * np.pi
 
 class Agent:
     initial_energy      = 300   # Initial energy
-    velocity            = 0.3   # Movement speed
-    angular_velocity    = 0.2   # Rotation speed
     sight_range         = 25    # View distance in world
 
     # x: x-coordinate
@@ -19,7 +17,6 @@ class Agent:
         self.angle = a
         self.net = net
 
-        self.speed = 0
         self.age = 0
         self.energy = self.initial_energy
 
@@ -36,7 +33,7 @@ class Agent:
         inputs = self.normalized_inputs(env)
         actions = self.net.activate(inputs)
 
-        speed = self.speed + actions[0]
+        speed = actions[0]
         angle = self.angle + actions[1]
 
         # Calculate new position
@@ -52,7 +49,6 @@ class Agent:
         # random = np.random.random()
         # x = self.normalize(self.x, 0, env.grid_size - 1)
         # y = self.normalize(self.y, 0, env.grid_size - 1)
-        speed = self.normalize(self.speed, 0, 3)
         angle = self.normalize(self.angle, 0, PI2)
         age = self.normalize(self.angle, 0, env.steps)
         energy = self.normalize(self.energy, 0, self.initial_energy)
@@ -67,7 +63,7 @@ class Agent:
         # other_dist = self.normalize(other_dist, 0, self.sight_range)
         # other_angle = self.normalize(other_angle, 0, PI2)
 
-        return const, angle, food_angle, food_dist, speed, age, energy,
+        return const, angle, food_angle, food_dist, age, energy,
 
     # Finds the nearest entity from a list of entities
     #   values: list of entities

@@ -37,9 +37,8 @@ def run(config_file):
         -2: "angle",
         -3: "angle to food",
         -4: "distance to food",
-        -5: "speed",
-        -6: "age",
-        -7: "energy",
+        -5: "age",
+        -6: "energy",
         0: "acceleration",
         1: "turn",
     }
