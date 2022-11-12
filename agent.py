@@ -4,11 +4,15 @@ PI2 = 2 * np.pi
 
 
 class Agent:
-    energy              = 300   # Initial energy
+    initial_energy      = 300   # Initial energy
     velocity            = 1.0   # Movement speed
     angular_velocity    = 1.0   # Rotation speed
     sight_range         = 25    # View distance in world
 
+    # x: x-coordinate
+    # y: y-coordinate
+    # a: angle (rad)
+    # net: feed-forward neural network
     def __init__(self, x, y, a, net):
         self.x = x
         self.y = y
@@ -16,6 +20,7 @@ class Agent:
         self.net = net
 
         self.age = 0
+        self.energy = self.initial_energy
 
     # Move one step in time
     def step(self, env):
@@ -26,24 +31,13 @@ class Agent:
         if self.energy <= 0:
             return
 
-        speed = 0
-        angle = self.angle
-
         # Activate brain
         inputs = self.normalized_inputs(env)
         actions = self.net.activate(inputs)
 
-        # Forward
-        if actions[0] > env.rand.random():
-            speed += self.velocity
-
-        # Rotate left
-        if actions[1] > env.rand.random():
-            angle -= self.angular_velocity
-
-        # Rotate right
-        if actions[2] > env.rand.random():
-            angle += self.angular_velocity
+        # TODO: Speed is 0.5 if speed has no connection
+        speed = ((actions[0] + 1) / 2) * self.velocity
+        angle = self.angle + actions[1] * self.angular_velocity
 
         # Calculate new position
         self.x = min(max(0, self.x + speed * np.cos(angle)), env.grid_size - 1)
@@ -51,29 +45,33 @@ class Agent:
 
         # Assign new values
         self.angle = angle % PI2
-        self.age += 1
         self.energy -= speed ** 2
 
     def normalized_inputs(self, env):
         const = 1
-        random = np.random.random()
+        # random = np.random.random()
         # x = self.normalize(self.x, 0, env.grid_size - 1)
         # y = self.normalize(self.y, 0, env.grid_size - 1)
         angle = self.normalize(self.angle, 0, PI2)
         age = self.normalize(self.angle, 0, env.steps)
+        energy = self.normalize(self.energy, 0, self.initial_energy)
 
         # Food
         food_dist, food_angle = self._find_nearest(env.foods)
-        food_dist = self.normalize(food_dist, 0, self.sight_range)
+        # food_dist = self.normalize(food_dist, 0, self.sight_range)
         food_angle = self.normalize(food_angle, 0, PI2)
 
-        return const, random, angle, age, food_dist, food_angle
+        return const, angle, food_angle, age, energy
 
     # Finds the nearest entity from a list of entities
     #   values: list of entities
     #   max_dist: maximum allowed distance
     # returns entity, distance and angle if there is a valid result, (None, max_dist, 0) if not.
     def _find_nearest(self, values):
+        # Return if given empty list
+        if values.size == 0:
+            return self.sight_range, 0
+
         nodes = np.asarray(values)
         dist_2 = np.sum((nodes - (self.x, self.y)) ** 2, axis=1)
         nearest = np.argmin(dist_2)

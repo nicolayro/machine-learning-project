@@ -5,10 +5,13 @@ import random
 import visualize
 import environment
 
+GENERATIONS = 200  # Number of generations to run
+
 # Seeding
 seed = 42
 random.seed(seed)
 env = environment.Environment(seed)
+
 
 def run(config_file):
     # Load configuration.
@@ -26,16 +29,16 @@ def run(config_file):
     p.add_reporter(stats)
     p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
-    # Run for up to n generations.
-    winner = p.run(env.evaluate_genomes, 4)
+    # Run for up to ${GENERATIONS} generations
+    winner = p.run(env.evaluate_genomes, GENERATIONS)
 
     node_names = {
         -1: "constant",
-        -2: "in speed",
-        -3: "angle",
-        -4: "angle to food",
-        -5: "age",
-        0: "out speed",
+        -2: "angle",
+        -3: "angle to food",
+        -4: "age",
+        -5: "energy",
+        0: "forward",
         1: "turn",
     }
 

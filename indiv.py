@@ -1,14 +1,12 @@
-import params
 import numpy as np
 
-import params
 
 # Individual in the environment
 class Indiv:
     energy              = 300   # Initial energy
     move_speed          = 0.3   # Movement speed
     angular_speed       = 0.2   # Rotation speed
-    sight_range         = 25    # View distance in world
+    sight_range         = 15    # View distance in world
 
     def __init__(self, x, y, angle, net):
         self.x = x

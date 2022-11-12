@@ -1,16 +1,17 @@
 import numpy as np
 import neat
 
-from indiv import Indiv
+from agent import Agent
 from renderer import Renderer
+from indiv import Indiv
 
 
 class Environment:
-    grid_size   = 64    # Size of the world
-    pop_size    = 60    # Initial population size
-    num_food    = 80    # Initial amount of food
+    grid_size   = 128   # Size of the world
+    pop_size    = 240   # Initial population size
+    num_food    = 320   # Initial amount of food
     nutrition   = 200   # Food nutrition
-    steps       = 400   # Number of time steps per generation
+    steps       = 300   # Number of time steps per generation
 
     agents = []
     foods = []
@@ -34,7 +35,7 @@ class Environment:
             x = self.rand.random() * (self.grid_size - 1) + 0.5
             y = self.rand.random() * (self.grid_size - 1) + 0.5
             a = self.rand.random() * 2 * np.pi
-            agent = Indiv(x, y, a, net)
+            agent = Agent(x, y, a, net)
             self.agents.append(agent)
 
         # Simulate
@@ -52,7 +53,7 @@ class Environment:
                 self.foods = new_foods
 
             # Render world to screen
-            if self.state % 50 == 0:
+            if self.state % 50 == 0 or self.state == 1:
                 self.renderer.render(self)
 
         # Evaluate

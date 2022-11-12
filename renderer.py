@@ -5,7 +5,7 @@ from time import sleep
 
 class Renderer:
     screen_size = 800  # Height/Width of window in pixels
-    fps         = 0    # Target frames per second
+    fps         = 30    # Target frames per second
 
     def __init__(self, grid_size):
         pygame.init()
