@@ -4,18 +4,19 @@ PI2 = 2 * np.pi
 
 
 class Agent:
-    initial_energy      = 300   # Initial energy
-    sight_range         = 25    # View distance in world
+    initial_energy      = 400   # Initial energy
+    sight_range         = 15    # View distance in world
 
     # x: x-coordinate
     # y: y-coordinate
     # a: angle (rad)
     # net: feed-forward neural network
-    def __init__(self, x, y, a, net):
+    def __init__(self, x, y, a, net, species):
         self.x = x
         self.y = y
         self.angle = a
         self.net = net
+        self.species = species
 
         self.age = 0
         self.energy = self.initial_energy
@@ -32,6 +33,8 @@ class Agent:
         # Activate brain
         inputs = self.normalized_inputs(env)
         actions = self.net.activate(inputs)
+        if len(actions) != 2:
+            print(len(actions))
 
         speed = actions[0]
         angle = self.angle + actions[1]
@@ -59,11 +62,32 @@ class Agent:
         food_angle = self.normalize(food_angle, 0, PI2)
 
         # Other agents
-        # other_dist, other_angle = self._find_nearest(np.asarray([(a.x, a.y) for a in env.agents]))
-        # other_dist = self.normalize(other_dist, 0, self.sight_range)
-        # other_angle = self.normalize(other_angle, 0, PI2)
+        other_dist, other_angle, same = self._find_nearest_other(env.agents)
+        other_dist = self.normalize(other_dist, 0, self.sight_range)
+        other_angle = self.normalize(other_angle, 0, PI2)
 
-        return const, angle, food_angle, food_dist, age, energy,
+        return const, angle, food_angle, food_dist, other_dist, other_angle, same
+
+    def _find_nearest_other(self, others):
+        min_dist = self.sight_range
+        nearest = None
+        for o in others:
+            dist = self.squared_dist_between((o.x, o.y))
+            if dist < min_dist:
+                min_dist = dist
+                nearest = o
+
+        if nearest is None:
+            return self.sight_range, 0, 0
+
+        x = nearest.x - self.x
+        y = nearest.y - self.y
+        angle = np.arctan2(y, x)
+        angle = self.angle - angle
+        same = int(self.species == nearest.species)
+
+        return min_dist, angle, same
+
 
     # Finds the nearest entity from a list of entities
     #   values: list of entities

@@ -55,8 +55,14 @@ class Renderer:
         for agent in env.agents:
 
             # TODO: Optimize :)
-            value = min(255, max(0, agent.energy))
-            red = (value, 0, 0)
+            life = min(255, max(0, agent.energy))
+            color = (0, 0, 0)
+            if agent.species % 3 == 0:
+                color = (life/2, life/2, life)
+            elif agent.species % 3 == 1:
+                color = (life, life/2, life/2)
+            elif agent.species % 3 == 2:
+                color = (life/2, life, life/2)
             white = (255, 255, 255)
             black = (0, 0, 0)
             surface = pygame.Surface((block_size, block_size))
@@ -66,7 +72,7 @@ class Renderer:
             surface.fill((255, 0, 255))
 
             # Create individual
-            pygame.draw.circle(surface, red, (block_size / 2, block_size / 2), block_size / 2)
+            pygame.draw.circle(surface, color, (block_size / 2, block_size / 2), block_size / 2)
             pygame.draw.circle(surface, white, (3 * block_size / 4, block_size / 2), block_size / 5)
             pygame.draw.circle(surface, black, (3 * block_size / 4, block_size / 2), block_size / 10)
 

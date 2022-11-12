@@ -5,15 +5,15 @@ import random
 import visualize
 import environment
 
-GENERATIONS = 200  # Number of generations to run
+GENERATIONS = 40000  # Number of generations to run
 
 # Seeding
 seed = 42
 random.seed(seed)
-env = environment.Environment(seed)
 
 
 def run(config_file):
+    env = environment.Environment(seed)
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -22,6 +22,7 @@ def run(config_file):
 
     # Create the population, which is the top-level object for a NEAT run.
     p = neat.Population(config)
+    env.species = p.species
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
@@ -37,8 +38,9 @@ def run(config_file):
         -2: "angle",
         -3: "angle to food",
         -4: "distance to food",
-        -5: "age",
-        -6: "energy",
+        -5: "other angle",
+        -6: "other dist",
+        -7: "other same",
         0: "acceleration",
         1: "turn",
     }
