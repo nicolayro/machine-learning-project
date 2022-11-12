@@ -5,7 +5,7 @@ import random
 import visualize
 import environment
 
-GENERATIONS = 200  # Number of generations to run
+GENERATIONS = 800  # Number of generations to run
 
 # Seeding
 seed = 42
@@ -36,10 +36,14 @@ def run(config_file):
         -1: "constant",
         -2: "angle",
         -3: "angle to food",
-        -4: "age",
-        -5: "energy",
+        -4: "distance to food",
+        -5: "angle to agent",
+        -6: "distance to agent",
+        -7: "age",
+        -8: "energy",
         0: "forward",
-        1: "turn",
+        1: "turn left",
+        2: "turn right",
     }
 
     now = datetime.datetime.now()

@@ -7,9 +7,9 @@ from indiv import Indiv
 
 
 class Environment:
-    grid_size   = 128   # Size of the world
-    pop_size    = 240   # Initial population size
-    num_food    = 320   # Initial amount of food
+    grid_size   = 64   # Size of the world
+    pop_size    = 60   # Initial population size
+    num_food    = 80   # Initial amount of food
     nutrition   = 200   # Food nutrition
     steps       = 300   # Number of time steps per generation
 
