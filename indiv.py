@@ -1,7 +1,4 @@
-import params
 import numpy as np
-
-import params
 
 # Individual in the environment
 class Indiv:
@@ -28,11 +25,11 @@ class Indiv:
         return const, speed, angle, angle_to_food, age
     
     def step(self, env):
-        self.energy -= 1
         self.age += 1
 
         # If the individual is out of food, don't do anything
         if self.energy <= 0:
+            self.energy = 0
             return
         
         # Activate brain
@@ -40,7 +37,7 @@ class Indiv:
         actions = self.net.activate(inputs)
 
         # Add input to state
-        speed = ((actions[0] + 1) / 2) * self.move_speed
+        speed = actions[0] * self.move_speed
         angle = self.angle + actions[1] * self.angular_speed
 
         new_x = self.x + speed * np.cos(angle)
@@ -56,6 +53,7 @@ class Indiv:
         self.x = min(max(0, new_x), env.grid_size - 1)
         self.y = min(max(0, new_y), env.grid_size - 1)
 
+        self.energy -= 1
         self.speed = speed
         self.angle = angle
         self.energy -= speed ** 2
