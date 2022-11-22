@@ -5,7 +5,7 @@ import random
 import visualize
 import environment
 
-generations = 500
+generations = 400
 seed = 42
 random.seed(seed)
 env = environment.Environment(seed)
@@ -31,10 +31,13 @@ def run(config_file):
 
     node_names = {
         -1: "constant",
-        -2: "in speed",
-        -3: "angle",
-        -4: "angle to food",
-        -5: "age",
+        -2: "age",
+        -3: "energy",
+        -4: "vision 0",
+        -5: "vision 1",
+        -6: "vision 2",
+        -7: "vision 3",
+        -8: "vision 4",
         0: "out speed",
         1: "turn",
     }

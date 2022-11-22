@@ -7,8 +7,8 @@ from renderer import Renderer
 
 class Environment:
     grid_size   = 100   # Size of the world
-    pop_size    = 50    # Initial population size
-    num_food    = 80    # Initial amount of food
+    pop_size    = 40    # Initial population size
+    num_food    = 50    # Initial amount of food
     nutrition   = 200   # Food nutrition
     steps       = 400   # Number of time steps per generation
 
