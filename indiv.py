@@ -1,14 +1,12 @@
-import params
 import numpy as np
-
-import params
 
 # Individual in the environment
 class Indiv:
-    energy              = 300   # Initial energy
+    start_energy        = 300   # Initial energy 
+    energy              = start_energy
     move_speed          = 0.3   # Movement speed
     angular_speed       = 0.2   # Rotation speed
-    sight_range         = 25    # View distance in world
+    sight_range         = 15    # View distance in world
 
     def __init__(self, x, y, angle, net):
         self.x = x
@@ -21,18 +19,17 @@ class Indiv:
 
     def normalized_inputs(self, env):
         const = 1
-        speed = self.speed / self.move_speed
-        angle = self.angle / np.pi
-        angle_to_food = self._find_nearest(env.foods) / (np.pi * 2)
         age = self.age / env.steps
-        return const, speed, angle, angle_to_food, age
+        energy = self.energy / self.start_energy
+        vision = self._get_normalized_vision(env.foods)
+        return const, age, energy, vision[0], vision[1], vision[2], vision[3], vision[4]
     
     def step(self, env):
-        self.energy -= 1
         self.age += 1
 
         # If the individual is out of food, don't do anything
         if self.energy <= 0:
+            self.energy = 0
             return
         
         # Activate brain
@@ -40,7 +37,7 @@ class Indiv:
         actions = self.net.activate(inputs)
 
         # Add input to state
-        speed = ((actions[0] + 1) / 2) * self.move_speed
+        speed = actions[0] * self.move_speed
         angle = self.angle + actions[1] * self.angular_speed
 
         new_x = self.x + speed * np.cos(angle)
@@ -56,6 +53,7 @@ class Indiv:
         self.x = min(max(0, new_x), env.grid_size - 1)
         self.y = min(max(0, new_y), env.grid_size - 1)
 
+        self.energy -= 1
         self.speed = speed
         self.angle = angle
         self.energy -= speed ** 2
@@ -82,3 +80,39 @@ class Indiv:
 
         return self.angle - angle
     
+    def _get_normalized_vision(self, values):
+        range_squared = self.sight_range ** 2
+        squared_min_dist = [range_squared, range_squared, range_squared, range_squared, range_squared]
+
+        if values.size == 0:
+            return [0, 0, 0, 0, 0]
+
+        for value in values:
+            angle = self.angle - np.arctan2(value[1] - self.y, value[0] - self.x)
+
+            if abs(angle) < ((2 * np.pi) / 3):
+                dist_squared = (value[0] - self.x) ** 2 + (value[1] - self.y) ** 2
+
+                if dist_squared < range_squared:
+                    if angle < (-np.pi / 4):
+                        if dist_squared < squared_min_dist[0]:
+                            squared_min_dist[0] = dist_squared 
+                    elif angle < (-np.pi / 24):
+                        if dist_squared < squared_min_dist[1]:
+                            squared_min_dist[1] = dist_squared 
+                    elif angle < (np.pi / 24):
+                        if dist_squared < squared_min_dist[2]:
+                            squared_min_dist[2] = dist_squared 
+                    elif angle < (np.pi / 4):
+                        if dist_squared < squared_min_dist[3]:
+                            squared_min_dist[3] = dist_squared 
+                    else:
+                        if dist_squared < squared_min_dist[4]:
+                            squared_min_dist[4] = dist_squared
+        
+        impulses = [0, 0, 0, 0, 0]
+
+        for i in range(5):
+            impulses[i] = (self.sight_range - np.sqrt(squared_min_dist[i])) / self.sight_range
+        
+        return impulses

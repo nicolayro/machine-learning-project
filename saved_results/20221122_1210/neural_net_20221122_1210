@@ -1,0 +1,16 @@
+digraph {
+	node [fontsize=9 height=0.2 shape=circle width=0.2]
+	constant [fillcolor=lightgray shape=box style=filled]
+	age [fillcolor=lightgray shape=box style=filled]
+	energy [fillcolor=lightgray shape=box style=filled]
+	"vision 0" [fillcolor=lightgray shape=box style=filled]
+	"vision 1" [fillcolor=lightgray shape=box style=filled]
+	"vision 2" [fillcolor=lightgray shape=box style=filled]
+	"vision 3" [fillcolor=lightgray shape=box style=filled]
+	"vision 4" [fillcolor=lightgray shape=box style=filled]
+	"out speed" [fillcolor=lightblue style=filled]
+	turn [fillcolor=lightblue style=filled]
+	"vision 3" -> turn [color=red penwidth=2.2160664797344385 style=solid]
+	energy -> "out speed" [color=green penwidth=0.19473638441305618 style=solid]
+	"vision 4" -> turn [color=green penwidth=0.3907843810566265 style=solid]
+}

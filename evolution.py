@@ -5,7 +5,7 @@ import random
 import visualize
 import environment
 
-# Seeding
+generations = 400
 seed = 42
 random.seed(seed)
 env = environment.Environment(seed)
@@ -27,14 +27,17 @@ def run(config_file):
     p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
     # Run for up to n generations.
-    winner = p.run(env.evaluate_genomes, 4)
+    winner = p.run(env.evaluate_genomes, generations)
 
     node_names = {
         -1: "constant",
-        -2: "in speed",
-        -3: "angle",
-        -4: "angle to food",
-        -5: "age",
+        -2: "age",
+        -3: "energy",
+        -4: "vision 0",
+        -5: "vision 1",
+        -6: "vision 2",
+        -7: "vision 3",
+        -8: "vision 4",
         0: "out speed",
         1: "turn",
     }
@@ -47,6 +50,18 @@ def run(config_file):
     visualize.plot_stats(stats, ylog=False, view=True, filename=("results/" + datestr + "/avg_fitness_" + datestr + ".svg"))
     visualize.plot_species(stats, view=True, filename=("results/" + datestr + "/speciation_" + datestr + ".svg"))
     visualize.draw_net(config, winner, view=True, node_names=node_names, filename=("results/" + datestr +"/neural_net_" + datestr), fmt="png")
+
+    # Find winner of last 10% of generations
+    last_winners = stats.most_fit_genomes[-int((generations/10)):]
+    last_winner = None
+
+    max_fitness = 0
+    for g in last_winners:
+        if g.fitness > max_fitness:
+            max_fitness = g.fitness
+            last_winner = g
+
+    visualize.draw_net(config, last_winner, view=True, node_names=node_names, filename=("results/" + datestr +"/last_neural_net_" + datestr), fmt="png")
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
