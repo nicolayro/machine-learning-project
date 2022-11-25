@@ -1,11 +1,13 @@
 import numpy as np
 
+edge_angle = (2 * np.pi) / 3
+small_angle = np.pi / 24
+wide_angle = np.pi / 4
 # Individual in the environment
 class Indiv:
     start_energy        = 300   # Initial energy 
-    energy              = start_energy
-    move_speed          = 0.3   # Movement speed
-    angular_speed       = 0.2   # Rotation speed
+    move_speed          = 1.0   # Movement speed
+    angular_speed       = 1.0   # Rotation speed
     sight_range         = 15    # View distance in world
 
     def __init__(self, x, y, angle, net):
@@ -16,13 +18,13 @@ class Indiv:
 
         self.speed = 0
         self.age = 0
+        self.score = 0
+        self.energy = self.start_energy
 
     def normalized_inputs(self, env):
         const = 1
-        age = self.age / env.steps
-        energy = self.energy / self.start_energy
         vision = self._get_normalized_vision(env.foods)
-        return const, age, energy, vision[0], vision[1], vision[2], vision[3], vision[4]
+        return const, vision[0], vision[1], vision[2], vision[3], vision[4]
     
     def step(self, env):
         self.age += 1
@@ -90,20 +92,20 @@ class Indiv:
         for value in values:
             angle = self.angle - np.arctan2(value[1] - self.y, value[0] - self.x)
 
-            if abs(angle) < ((2 * np.pi) / 3):
+            if abs(angle) < edge_angle:
                 dist_squared = (value[0] - self.x) ** 2 + (value[1] - self.y) ** 2
 
                 if dist_squared < range_squared:
-                    if angle < (-np.pi / 4):
+                    if angle < (-wide_angle):
                         if dist_squared < squared_min_dist[0]:
                             squared_min_dist[0] = dist_squared 
-                    elif angle < (-np.pi / 24):
+                    elif angle < (-small_angle):
                         if dist_squared < squared_min_dist[1]:
                             squared_min_dist[1] = dist_squared 
-                    elif angle < (np.pi / 24):
+                    elif angle < small_angle:
                         if dist_squared < squared_min_dist[2]:
                             squared_min_dist[2] = dist_squared 
-                    elif angle < (np.pi / 4):
+                    elif angle < wide_angle:
                         if dist_squared < squared_min_dist[3]:
                             squared_min_dist[3] = dist_squared 
                     else:

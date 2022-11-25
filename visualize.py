@@ -3,6 +3,9 @@ import warnings
 import graphviz
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.signal import savgol_filter
+import csv
+from pathlib import Path
 
 
 def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
@@ -10,30 +13,57 @@ def plot_stats(statistics, ylog=False, view=False, filename='avg_fitness.svg'):
     if plt is None:
         warnings.warn("This display is not available due to a missing optional dependency (matplotlib)")
         return
-
     generation = range(len(statistics.most_fit_genomes))
     best_fitness = [c.fitness for c in statistics.most_fit_genomes]
     avg_fitness = np.array(statistics.get_fitness_mean())
-    stdev_fitness = np.array(statistics.get_fitness_stdev())
 
-    plt.plot(generation, avg_fitness, 'b-', label="average")
-    plt.plot(generation, avg_fitness - stdev_fitness, 'g-.', label="-1 sd")
-    plt.plot(generation, avg_fitness + stdev_fitness, 'g-.', label="+1 sd")
-    plt.plot(generation, best_fitness, 'r-', label="best")
+    data_file = Path(filename).with_suffix('.csv')
 
-    plt.title("Population's average and best fitness")
-    plt.xlabel("Generations")
-    plt.ylabel("Fitness")
-    plt.grid()
-    plt.legend(loc="best")
-    if ylog:
-        plt.gca().set_yscale('symlog')
+    # Save to file
+    with open(data_file, 'w') as file:
+        for i in generation:
+            file.write(f'{i},{best_fitness[i]},{avg_fitness[i]}\n')
 
-    plt.savefig(filename)
+    draw_from_file(data_file)
+
     if view:
         plt.show()
 
     plt.close()
+
+
+def draw_from_file(filename):
+    generation = []
+    avg_fitness = []
+    best_fitness = []
+    with open(filename, 'r') as file:
+        csvreader = csv.reader(file)
+        for row in csvreader:
+            generation.append(int(row[0]))
+            best_fitness.append(float(row[1]))
+            avg_fitness.append(float(row[2]))
+
+    generation = range(generation[-1] + 1)
+
+    yhat = savgol_filter(best_fitness, 31, 3, mode='nearest')  # window size 31, polynomial order 3
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    ax.plot(generation, avg_fitness, 'b-', label="average")
+    ax.plot(generation, best_fitness, 'g-', label="best", alpha=0.3)
+    ax.plot(generation, yhat, 'r-', label="sav-gol")
+
+    ax.set_title("Population's average and best fitness")
+    ax.set_xlabel("Generations")
+    ax.set_ylabel("Fitness")
+    ax.grid()
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width * 0.85, box.height])
+    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+    filename = Path(filename).with_suffix('.svg')
+    plt.savefig(filename)
 
 
 def plot_spikes(spikes, view=False, filename=None, title=None):
@@ -179,3 +209,7 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
     dot.render(filename, view=view)
 
     return dot
+
+
+if __name__ == '__main__':
+    draw_from_file('results/20221125_1356/avg_fitness_20221125_1356.csv')

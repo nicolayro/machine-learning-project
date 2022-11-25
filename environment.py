@@ -6,11 +6,11 @@ from renderer import Renderer
 
 
 class Environment:
-    grid_size   = 100   # Size of the world
-    pop_size    = 40    # Initial population size
-    num_food    = 50    # Initial amount of food
+    grid_size   = 64    # Size of the world
+    pop_size    = 60    # Initial population size
+    num_food    = 120   # Initial amount of food
     nutrition   = 200   # Food nutrition
-    steps       = 400   # Number of time steps per generation
+    steps       = 300   # Number of time steps per generation
 
     agents = []
     foods = []

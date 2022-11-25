@@ -5,10 +5,11 @@ import random
 import visualize
 import environment
 
-generations = 400
-seed = 42
+generations = 100
+seed = 183
 random.seed(seed)
 env = environment.Environment(seed)
+
 
 def run(config_file):
     # Load configuration.
@@ -24,20 +25,17 @@ def run(config_file):
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
-    p.add_reporter(neat.Checkpointer(100, filename_prefix="results/neat-checkpoint"))
 
     # Run for up to n generations.
     winner = p.run(env.evaluate_genomes, generations)
 
     node_names = {
         -1: "constant",
-        -2: "age",
-        -3: "energy",
-        -4: "vision 0",
-        -5: "vision 1",
-        -6: "vision 2",
-        -7: "vision 3",
-        -8: "vision 4",
+        -2: "vision 0",
+        -3: "vision 1",
+        -4: "vision 2",
+        -5: "vision 3",
+        -6: "vision 4",
         0: "out speed",
         1: "turn",
     }
@@ -68,6 +66,7 @@ def run(config_file):
 
 
 if __name__ == '__main__':
+    # visualize.draw_from_file('results/20221125_1133/avg_fitness_20221125_1133.svg.data')
     # Determine path to configuration file. This path manipulation is
     # here so that the script will run successfully regardless of the
     # current working directory.
