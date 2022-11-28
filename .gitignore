@@ -3,3 +3,4 @@ __pycache__/*
 venv
 params.py
 results/*
+.pkl
